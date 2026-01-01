@@ -12,6 +12,7 @@ from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
     MessageHandler,
+    CallbackQueryHandler,
     ContextTypes,
     filters,
     ChatMemberHandler,
@@ -52,24 +53,31 @@ def get_user(data, uid):
             "hobby": "N/A",
             "bio": "N/A",
         },
-        "groups": {}  # group_id -> photo_file_id
+        "groups": {}
     })
 
-# ================= KEYBOARDS =================
-INLINE_WELCOME = InlineKeyboardMarkup([
-    [
-        InlineKeyboardButton("👑 Owner", url=OWNER_LINK),
-        InlineKeyboardButton("🧠 Developer", url=DEV_LINK),
-    ],
-    [
-        InlineKeyboardButton("💬 Support", url=SUPPORT_LINK),
-        InlineKeyboardButton("📢 Official Channel", url=CHANNEL_LINK),
-    ],
-    [
-        InlineKeyboardButton("❓ Help", callback_data="help"),
-    ],
-])
+# ================= INLINE KEYBOARDS =================
+def welcome_inline():
+    return InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("👑 Owner", url=OWNER_LINK),
+            InlineKeyboardButton("🧠 Developer", url=DEV_LINK),
+        ],
+        [
+            InlineKeyboardButton("💬 Support", url=SUPPORT_LINK),
+            InlineKeyboardButton("📢 Official Channel", url=CHANNEL_LINK),
+        ],
+        [
+            InlineKeyboardButton("❓ Help", callback_data="help"),
+        ],
+    ])
 
+def help_inline():
+    return InlineKeyboardMarkup([
+        [InlineKeyboardButton("⬅️ Back", callback_data="back")]
+    ])
+
+# ================= REPLY KEYBOARDS =================
 KB_SET = ReplyKeyboardMarkup([["✨ Set Identity"]], resize_keyboard=True)
 KB_EDIT = ReplyKeyboardMarkup([["✏️ Edit Identity"]], resize_keyboard=True)
 KB_GENDER = ReplyKeyboardMarkup([["Male 💁‍♂️", "Female 💁‍♀️"]], resize_keyboard=True)
@@ -88,27 +96,33 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         "Let’s get started 👇"
     )
 
-    await update.message.reply_text(
-        text,
-        reply_markup=INLINE_WELCOME
-    )
-    await update.message.reply_text(
-        "Tap below to begin:",
-        reply_markup=KB_SET
-    )
+    await update.message.reply_text(text, reply_markup=welcome_inline())
+    await update.message.reply_text("Tap below to begin:", reply_markup=KB_SET)
 
-# ================= HELP =================
+# ================= HELP & BACK =================
 async def help_cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
-    await q.edit_message_text(
-        "🤖 INTRO BOT HELP\n\n"
-        "• Set identity in DM only\n"
-        "• Use /intro in groups (reply required)\n"
-        "• Admins approve profile photos\n"
-        "• Skipped info shows as N/A\n"
-        "• No buttons work in groups"
-    )
+
+    if q.data == "help":
+        await q.edit_message_text(
+            "🤖 INTRO BOT – HELP\n\n"
+            "• Identity setup works in DM only\n"
+            "• Use /intro in groups (reply required)\n"
+            "• Admins approve profile photos\n"
+            "• Skipped fields show as N/A\n"
+            "• No buttons work in groups",
+            reply_markup=help_inline()
+        )
+
+    elif q.data == "back":
+        text = (
+            f"✨ Welcome, {q.from_user.first_name}! ✨\n\n"
+            "This is your personal space to shape your identity your way.\n\n"
+            "Share only what feels right — everything stays in your control.\n\n"
+            "Let’s get started 👇"
+        )
+        await q.edit_message_text(text, reply_markup=welcome_inline())
 
 # ================= TEXT HANDLER (DM) =================
 async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -120,7 +134,6 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
     user = get_user(data, uid)
 
-    # START / EDIT
     if msg in ["✨ Set Identity", "✏️ Edit Identity"]:
         ctx.user_data.clear()
         user["identity"] = {k: "N/A" for k in user["identity"]}
@@ -129,7 +142,6 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("👤 Enter Name:", reply_markup=ReplyKeyboardRemove())
         return
 
-    # CANCEL
     if msg == "Cancel":
         ctx.user_data.clear()
         await update.message.reply_text("Cancelled.", reply_markup=KB_SET)
@@ -145,6 +157,7 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         user["identity"]["name"] = val(msg)
         ctx.user_data["step"] = "age"
         await update.message.reply_text("🎂 Enter Age (10–50):")
+
     elif step == "age":
         if not msg.isdigit() or not (10 <= int(msg) <= 50):
             await update.message.reply_text("❌ Age must be 10–50.")
@@ -152,34 +165,41 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         user["identity"]["age"] = msg
         ctx.user_data["step"] = "location"
         await update.message.reply_text("📍 Enter Location:")
+
     elif step == "location":
         user["identity"]["location"] = val(msg)
         ctx.user_data["step"] = "gender"
         await update.message.reply_text("🧬 Select Gender:", reply_markup=KB_GENDER)
+
     elif step == "gender":
         user["identity"]["gender"] = (
             "🧬 Gender - Male 💁‍♂️" if "Male" in msg else "🧬 Gender - Female 💁‍♀️"
         )
         ctx.user_data["step"] = "relationship"
         await update.message.reply_text("💓 Relationship:", reply_markup=KB_REL)
+
     elif step == "relationship":
         user["identity"]["relationship"] = (
             "💓 Relationship - Single 🖤" if "Single" in msg else "💓 Relationship - Mingle ♥️"
         )
         ctx.user_data["step"] = "song"
         await update.message.reply_text("🎵 Favorite Song:", reply_markup=KB_SKIP_CANCEL)
+
     elif step == "song":
         user["identity"]["song"] = val(msg)
         ctx.user_data["step"] = "actor"
         await update.message.reply_text("🎬 Favorite Actor:", reply_markup=KB_SKIP_CANCEL)
+
     elif step == "actor":
         user["identity"]["actor"] = val(msg)
         ctx.user_data["step"] = "hobby"
         await update.message.reply_text("🎯 Favorite Hobby:", reply_markup=KB_SKIP_CANCEL)
+
     elif step == "hobby":
         user["identity"]["hobby"] = val(msg)
         ctx.user_data["step"] = "bio"
         await update.message.reply_text("📝 Short Bio:", reply_markup=KB_SKIP_CANCEL)
+
     elif step == "bio":
         user["identity"]["bio"] = val(msg)
         user["submitted"] = True
@@ -249,9 +269,8 @@ app = ApplicationBuilder().token(BOT_TOKEN).build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("intro", intro))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_dm))
+app.add_handler(CallbackQueryHandler(help_cb, pattern="^(help|back)$"))
 app.add_handler(ChatMemberHandler(welcome_member, ChatMemberHandler.CHAT_MEMBER))
-app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_member))
-app.add_handler(MessageHandler(filters.UpdateType.CALLBACK_QUERY, help_cb))
 
 print("✅ INTRO BOT RUNNING (TG- @Frx_Shooter)")
 app.run_polling()
