@@ -253,5 +253,5 @@ app.add_handler(ChatMemberHandler(welcome_member, ChatMemberHandler.CHAT_MEMBER)
 app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_member))
 app.add_handler(MessageHandler(filters.UpdateType.CALLBACK_QUERY, help_cb))
 
-print("✅ INTRO BOT RUNNING (FINAL BUILD)")
+print("✅ INTRO BOT RUNNING (TG- @Frx_Shooter)")
 app.run_polling()
