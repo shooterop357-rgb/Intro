@@ -68,8 +68,11 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         "𝗟𝗲𝘁’𝘀 𝗴𝗲𝘁 𝘀𝘁𝗮𝗿𝘁𝗲𝗱 👇"
     )
 
-    await update.message.reply_text(text, reply_markup=START_KB)
-
+    await ctx.bot.send_message(
+    chat_id=update.effective_chat.id,
+    text=text,
+    reply_markup=START_KB
+)
 # ================= HELP =================
 async def help_msg(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
