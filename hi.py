@@ -53,7 +53,7 @@ def get_user(data, uid):
             "hobby": "N/A",
             "bio": "N/A",
         },
-        "groups": {}
+        "groups": {}  # group_id -> photo_file_id
     })
 
 # ================= INLINE KEYBOARDS =================
@@ -99,7 +99,7 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(text, reply_markup=welcome_inline())
     await update.message.reply_text("Tap below to begin:", reply_markup=KB_SET)
 
-# ================= HELP & BACK =================
+# ================= HELP / BACK =================
 async def help_cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     q = update.callback_query
     await q.answer()
@@ -109,12 +109,10 @@ async def help_cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             "🤖 INTRO BOT – HELP\n\n"
             "• Identity setup works in DM only\n"
             "• Use /intro in groups (reply required)\n"
-            "• Admins approve profile photos\n"
-            "• Skipped fields show as N/A\n"
-            "• No buttons work in groups",
+            "• /setprofile /updateprofile /removeprofile → group only\n"
+            "• Skipped fields show as N/A",
             reply_markup=help_inline()
         )
-
     elif q.data == "back":
         text = (
             f"✨ Welcome, {q.from_user.first_name}! ✨\n\n"
@@ -124,7 +122,7 @@ async def help_cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
         await q.edit_message_text(text, reply_markup=welcome_inline())
 
-# ================= TEXT HANDLER (DM) =================
+# ================= IDENTITY (DM) =================
 async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type != "private":
         return
@@ -212,18 +210,82 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     save(data)
 
+# ================= PROFILE PHOTO COMMANDS (GROUP) =================
+async def setprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    if update.effective_chat.type == "private":
+        return
+
+    if not update.message.reply_to_message or not update.message.photo:
+        await update.message.reply_text("❌ Reply to a user with a photo.")
+        return
+
+    data = load()
+    target = update.message.reply_to_message.from_user
+    uid = str(target.id)
+    gid = str(update.effective_chat.id)
+    user = get_user(data, uid)
+
+    if gid in user["groups"]:
+        await update.message.reply_text("⚠️ Profile already set. Use /updateprofile.")
+        return
+
+    user["groups"][gid] = update.message.photo[-1].file_id
+    save(data)
+    await update.message.reply_text("✅ Profile photo set.")
+
+async def updateprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    if update.effective_chat.type == "private":
+        return
+
+    if not update.message.reply_to_message or not update.message.photo:
+        await update.message.reply_text("❌ Reply to a user with a photo.")
+        return
+
+    data = load()
+    target = update.message.reply_to_message.from_user
+    uid = str(target.id)
+    gid = str(update.effective_chat.id)
+    user = get_user(data, uid)
+
+    user["groups"][gid] = update.message.photo[-1].file_id
+    save(data)
+    await update.message.reply_text("♻️ Profile photo updated.")
+
+async def removeprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    if update.effective_chat.type == "private":
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text("❌ Reply to a user.")
+        return
+
+    data = load()
+    target = update.message.reply_to_message.from_user
+    uid = str(target.id)
+    gid = str(update.effective_chat.id)
+    user = get_user(data, uid)
+
+    if gid not in user["groups"]:
+        await update.message.reply_text("⚠️ No profile photo set.")
+        return
+
+    del user["groups"][gid]
+    save(data)
+    await update.message.reply_text("🗑 Profile photo removed.")
+
 # ================= INTRO (GROUP) =================
 async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
 
     if not update.message.reply_to_message:
-        await update.message.reply_text("❌ Please reply to a user to use this command.")
+        await update.message.reply_text("❌ Reply to a user.")
         return
 
     data = load()
     target = update.message.reply_to_message.from_user
     uid = str(target.id)
+    gid = str(update.effective_chat.id)
     user = data.get(uid)
 
     mention = f'<a href="tg://user?id={target.id}">{target.first_name}</a>'
@@ -231,13 +293,13 @@ async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if not user or not user.get("submitted"):
         await update.message.reply_text(
             f"❌ Someone wants to know about you, {mention}.\n"
-            "Please set your profile by messaging me in DM.",
+            "Please set your identity in DM.",
             parse_mode="HTML"
         )
         return
 
     p = user["identity"]
-    await update.message.reply_text(
+    caption = (
         f"👤 Profile\n\n"
         f"👤 Name: {p['name']}\n"
         f"🎂 Age: {p['age']}\n"
@@ -250,16 +312,24 @@ async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         f"📝 Bio:\n{p['bio']}"
     )
 
+    if gid in user["groups"]:
+        await update.message.reply_photo(
+            photo=user["groups"][gid],
+            caption=caption
+        )
+    else:
+        await update.message.reply_text(caption)
+
 # ================= NEW MEMBER =================
 async def welcome_member(update: ChatMemberUpdated, ctx: ContextTypes.DEFAULT_TYPE):
     if update.chat.type == "private":
         return
     if update.new_chat_member.status == "member":
-        user = update.new_chat_member.user
-        mention = f'<a href="tg://user?id={user.id}">{user.first_name}</a>'
+        u = update.new_chat_member.user
+        mention = f'<a href="tg://user?id={u.id}">{u.first_name}</a>'
         await ctx.bot.send_message(
             update.chat.id,
-            f"👋 Welcome {mention}!\n\nPlease set your information by messaging me in DM.",
+            f"👋 Welcome {mention}!\nPlease set your identity by messaging me in DM.",
             parse_mode="HTML"
         )
 
@@ -268,9 +338,12 @@ app = ApplicationBuilder().token(BOT_TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("intro", intro))
+app.add_handler(CommandHandler("setprofile", setprofile))
+app.add_handler(CommandHandler("updateprofile", updateprofile))
+app.add_handler(CommandHandler("removeprofile", removeprofile))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_dm))
 app.add_handler(CallbackQueryHandler(help_cb, pattern="^(help|back)$"))
 app.add_handler(ChatMemberHandler(welcome_member, ChatMemberHandler.CHAT_MEMBER))
 
-print("✅ INTRO BOT RUNNING (TG- @Frx_Shooter)")
+print("✅ INTRO BOT RUNNING (FINAL)")
 app.run_polling()
