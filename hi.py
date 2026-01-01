@@ -56,6 +56,14 @@ def get_user(data, uid):
         "groups": {}  # group_id -> dp_file_id
     })
 
+# ================= ADMIN CHECK =================
+async def is_group_admin(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> bool:
+    member = await ctx.bot.get_chat_member(
+        update.effective_chat.id,
+        update.effective_user.id
+    )
+    return member.status in ("administrator", "creator")
+
 # ================= INLINE KEYBOARDS =================
 def welcome_inline():
     return InlineKeyboardMarkup([
@@ -110,18 +118,18 @@ async def help_cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             "• Identity setup works in DM only\n"
             "• Use /intro in groups (reply required)\n"
             "• Profile photo is taken from user's Telegram DP\n"
-            "• /setprofile /updateprofile /removeprofile → group only\n"
+            "• Profile commands are ADMIN ONLY\n"
             "• Skipped fields show as N/A",
             reply_markup=help_inline()
         )
     elif q.data == "back":
-        text = (
+        await q.edit_message_text(
             f"✨ Welcome, {q.from_user.first_name}! ✨\n\n"
             "This is your personal space to shape your identity your way.\n\n"
             "Share only what feels right — everything stays in your control.\n\n"
-            "Let’s get started 👇"
+            "Let’s get started 👇",
+            reply_markup=welcome_inline()
         )
-        await q.edit_message_text(text, reply_markup=welcome_inline())
 
 # ================= IDENTITY (DM) =================
 async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -211,12 +219,17 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     save(data)
 
-# ================= PROFILE PHOTO COMMANDS (GROUP | DP BASED) =================
+# ================= PROFILE COMMANDS (ADMIN ONLY) =================
 async def setprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
+
+    if not await is_group_admin(update, ctx):
+        await update.message.reply_text("❌ This command is for group administrators only.")
+        return
+
     if not update.message.reply_to_message:
-        await update.message.reply_text("❌ Reply to a user to use this command.")
+        await update.message.reply_text("❌ Reply to a user to set their profile.")
         return
 
     data = load()
@@ -236,13 +249,18 @@ async def setprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     user["groups"][gid] = photos.photos[0][-1].file_id
     save(data)
-    await update.message.reply_text("✅ Profile photo set from user DP.")
+    await update.message.reply_text("✅ Profile photo set from user's Telegram DP.")
 
 async def updateprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
+
+    if not await is_group_admin(update, ctx):
+        await update.message.reply_text("❌ This command is for group administrators only.")
+        return
+
     if not update.message.reply_to_message:
-        await update.message.reply_text("❌ Reply to a user to use this command.")
+        await update.message.reply_text("❌ Reply to a user to update their profile.")
         return
 
     data = load()
@@ -262,13 +280,18 @@ async def updateprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     user["groups"][gid] = photos.photos[0][-1].file_id
     save(data)
-    await update.message.reply_text("♻️ Profile photo updated from user DP.")
+    await update.message.reply_text("♻️ Profile photo updated from user's Telegram DP.")
 
 async def removeprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
+
+    if not await is_group_admin(update, ctx):
+        await update.message.reply_text("❌ This command is for group administrators only.")
+        return
+
     if not update.message.reply_to_message:
-        await update.message.reply_text("❌ Reply to a user.")
+        await update.message.reply_text("❌ Reply to a user to remove their profile.")
         return
 
     data = load()
@@ -324,10 +347,7 @@ async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     )
 
     if gid in user["groups"]:
-        await update.message.reply_photo(
-            photo=user["groups"][gid],
-            caption=caption
-        )
+        await update.message.reply_photo(photo=user["groups"][gid], caption=caption)
     else:
         await update.message.reply_text(caption)
 
@@ -358,5 +378,5 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_dm))
 app.add_handler(CallbackQueryHandler(help_cb, pattern="^(help|back)$"))
 app.add_handler(ChatMemberHandler(welcome_member, ChatMemberHandler.CHAT_MEMBER))
 
-print("✅ INTRO BOT RUNNING (TG-@Frx_Shooter)")
+print("✅ INTRO BOT RUNNING (FINAL – ADMIN SAFE)")
 app.run_polling()
