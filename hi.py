@@ -53,7 +53,7 @@ def get_user(data, uid):
             "hobby": "N/A",
             "bio": "N/A",
         },
-        "groups": {}  # group_id -> photo_file_id
+        "groups": {}  # group_id -> dp_file_id
     })
 
 # ================= INLINE KEYBOARDS =================
@@ -109,6 +109,7 @@ async def help_cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             "🤖 INTRO BOT – HELP\n\n"
             "• Identity setup works in DM only\n"
             "• Use /intro in groups (reply required)\n"
+            "• Profile photo is taken from user's Telegram DP\n"
             "• /setprofile /updateprofile /removeprofile → group only\n"
             "• Skipped fields show as N/A",
             reply_markup=help_inline()
@@ -210,13 +211,12 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     save(data)
 
-# ================= PROFILE PHOTO COMMANDS (GROUP) =================
+# ================= PROFILE PHOTO COMMANDS (GROUP | DP BASED) =================
 async def setprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
-
-    if not update.message.reply_to_message or not update.message.photo:
-        await update.message.reply_text("❌ Reply to a user with a photo.")
+    if not update.message.reply_to_message:
+        await update.message.reply_text("❌ Reply to a user to use this command.")
         return
 
     data = load()
@@ -224,21 +224,25 @@ async def setprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     uid = str(target.id)
     gid = str(update.effective_chat.id)
     user = get_user(data, uid)
+
+    photos = await ctx.bot.get_user_profile_photos(target.id, limit=1)
+    if photos.total_count == 0:
+        await update.message.reply_text("❌ User has no Telegram profile photo.")
+        return
 
     if gid in user["groups"]:
         await update.message.reply_text("⚠️ Profile already set. Use /updateprofile.")
         return
 
-    user["groups"][gid] = update.message.photo[-1].file_id
+    user["groups"][gid] = photos.photos[0][-1].file_id
     save(data)
-    await update.message.reply_text("✅ Profile photo set.")
+    await update.message.reply_text("✅ Profile photo set from user DP.")
 
 async def updateprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
-
-    if not update.message.reply_to_message or not update.message.photo:
-        await update.message.reply_text("❌ Reply to a user with a photo.")
+    if not update.message.reply_to_message:
+        await update.message.reply_text("❌ Reply to a user to use this command.")
         return
 
     data = load()
@@ -247,14 +251,22 @@ async def updateprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     gid = str(update.effective_chat.id)
     user = get_user(data, uid)
 
-    user["groups"][gid] = update.message.photo[-1].file_id
+    photos = await ctx.bot.get_user_profile_photos(target.id, limit=1)
+    if photos.total_count == 0:
+        await update.message.reply_text("❌ User has no Telegram profile photo.")
+        return
+
+    if gid not in user["groups"]:
+        await update.message.reply_text("❌ No profile set. Use /setprofile first.")
+        return
+
+    user["groups"][gid] = photos.photos[0][-1].file_id
     save(data)
-    await update.message.reply_text("♻️ Profile photo updated.")
+    await update.message.reply_text("♻️ Profile photo updated from user DP.")
 
 async def removeprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
-
     if not update.message.reply_to_message:
         await update.message.reply_text("❌ Reply to a user.")
         return
@@ -277,7 +289,6 @@ async def removeprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
-
     if not update.message.reply_to_message:
         await update.message.reply_text("❌ Reply to a user.")
         return
@@ -329,7 +340,9 @@ async def welcome_member(update: ChatMemberUpdated, ctx: ContextTypes.DEFAULT_TY
         mention = f'<a href="tg://user?id={u.id}">{u.first_name}</a>'
         await ctx.bot.send_message(
             update.chat.id,
-            f"👋 Welcome {mention}!\nPlease set your identity by messaging me in DM.",
+            f"👋 Welcome {mention}!\n\n"
+            "🆔 Please set your identity by messaging me in DM.\n"
+            "🖼 Profile photo will be set by group administration.",
             parse_mode="HTML"
         )
 
@@ -345,5 +358,5 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_dm))
 app.add_handler(CallbackQueryHandler(help_cb, pattern="^(help|back)$"))
 app.add_handler(ChatMemberHandler(welcome_member, ChatMemberHandler.CHAT_MEMBER))
 
-print("✅ INTRO BOT RUNNING (FINAL)")
+print("✅ INTRO BOT RUNNING (TG-@Frx_Shooter)")
 app.run_polling()
