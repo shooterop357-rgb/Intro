@@ -18,6 +18,8 @@ from telegram.ext import (
     ChatMemberHandler,
 )
 
+import time  # ⏱ timeout ke liye
+
 # ================= CONFIG =================
 BOT_TOKEN = "8161458476:AAH76ALCfc-zWa3Lwh8nitkjw82i8QJYat8"
 
@@ -27,6 +29,8 @@ SUPPORT_LINK = "https://t.me/hiestarboy"
 CHANNEL_LINK = "https://t.me/all_state_gc"
 
 DATA_FILE = "data.json"
+
+INTRO_COOLDOWN = {}  # {(chat_id, user_id): (count, last_time)}
 
 # ================= STORAGE =================
 def load():
@@ -373,6 +377,23 @@ async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
 
+    # ===== TIMEOUT START (LINE ~380) =====
+    now = time.time()
+    key = (update.effective_chat.id, update.effective_user.id)
+
+    count, last_time = INTRO_COOLDOWN.get(key, (0, 0))
+
+    if now - last_time < 60:
+        if count >= 3:
+            await update.message.reply_text(
+                "⏳ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘄𝗮𝗶𝘁 𝟭 𝗺𝗶𝗻𝘂𝘁𝗲 𝗯𝗲𝗳𝗼𝗿𝗲 𝘂𝘀𝗶𝗻𝗴 𝗧𝗵𝗶𝘀 𝗖𝗼𝗺𝗺𝗮𝗻𝗱 𝗮𝗴𝗮𝗶𝗻."
+            )
+            return
+        INTRO_COOLDOWN[key] = (count + 1, last_time)
+    else:
+        INTRO_COOLDOWN[key] = (1, now)
+    # ===== TIMEOUT END =====
+
     data = load()
 
     target = (
@@ -423,12 +444,13 @@ async def welcome_member(update: ChatMemberUpdated, ctx: ContextTypes.DEFAULT_TY
     if chat.type == "private":
         return
 
-    new = update.chat_member.new_chat_member
-    old = update.chat_member.old_chat_member
+    old_status = update.chat_member.old_chat_member.status
+    new_status = update.chat_member.new_chat_member.status
 
-    if old.status in ("left", "kicked") and new.status == "member":
-        u = new.user
-        mention = f'<a href="tg://user?id={u.id}">{u.first_name}</a>'
+    # ✅ REAL JOIN DETECTION
+    if old_status in ("left", "kicked") and new_status == "member":
+        user = update.chat_member.new_chat_member.user
+        mention = f'<a href="tg://user?id={user.id}">{user.first_name}</a>'
 
         await ctx.bot.send_message(
             chat.id,
