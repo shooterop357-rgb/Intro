@@ -68,29 +68,29 @@ async def is_group_admin(update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> bool
 def welcome_inline():
     return InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("👑 Owner", url=OWNER_LINK),
-            InlineKeyboardButton("🧠 Developer", url=DEV_LINK),
+            InlineKeyboardButton("👑 𝐎𝐰𝐧𝐞𝐫", url=OWNER_LINK),
+            InlineKeyboardButton("🧠 𝐃𝐞𝐯𝐞𝐥𝐨𝐩𝐞𝐫", url=DEV_LINK),
         ],
         [
-            InlineKeyboardButton("💬 Support", url=SUPPORT_LINK),
-            InlineKeyboardButton("📢 Official Channel", url=CHANNEL_LINK),
+            InlineKeyboardButton("💬 𝐒𝐮𝐩𝐩𝐨𝐫𝐭", url=SUPPORT_LINK),
+            InlineKeyboardButton("📢 𝐎𝐟𝐟𝐢𝐜𝐢𝐚𝐥 𝐂𝐡𝐚𝐧𝐧𝐞𝐥", url=CHANNEL_LINK),
         ],
         [
-            InlineKeyboardButton("❓ Help", callback_data="help"),
+            InlineKeyboardButton("❓ 𝐇𝐞𝐥𝐩", callback_data="help"),
         ],
     ])
 
 def help_inline():
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("⬅️ Back", callback_data="back")]
+        [InlineKeyboardButton("⬅️ 𝐁𝐚𝐜𝐤", callback_data="back")]
     ])
 
 # ================= REPLY KEYBOARDS =================
-KB_SET = ReplyKeyboardMarkup([["✨ Set Identity"]], resize_keyboard=True)
-KB_EDIT = ReplyKeyboardMarkup([["✏️ Edit Identity"]], resize_keyboard=True)
-KB_GENDER = ReplyKeyboardMarkup([["Male 💁‍♂️", "Female 💁‍♀️"]], resize_keyboard=True)
-KB_REL = ReplyKeyboardMarkup([["Single 🖤", "Mingle ♥️"]], resize_keyboard=True)
-KB_SKIP_CANCEL = ReplyKeyboardMarkup([["Skip", "Cancel"]], resize_keyboard=True)
+KB_SET = ReplyKeyboardMarkup([["✨ 𝐒𝐞𝐭 𝐈𝐝𝐞𝐧𝐭𝐢𝐭𝐲"]], resize_keyboard=True)
+KB_EDIT = ReplyKeyboardMarkup([["✏️ 𝐄𝐝𝐢𝐭 𝐈𝐝𝐞𝐧𝐭𝐢𝐭𝐲"]], resize_keyboard=True)
+KB_GENDER = ReplyKeyboardMarkup([["𝐌𝐚𝐥𝐞 💁‍♂️", "𝐅𝐞𝐦𝐚𝐥𝐞 💁‍♀️"]], resize_keyboard=True)
+KB_REL = ReplyKeyboardMarkup([["𝐒𝐢𝐧𝐠𝐥𝐞 🖤", "𝐌𝐢𝐧𝐠𝐥𝐞 ♥️"]], resize_keyboard=True)
+KB_SKIP_CANCEL = ReplyKeyboardMarkup([["𝐒𝐤𝐢𝐩", "𝐂𝐚𝐧𝐜𝐞𝐥"]], resize_keyboard=True)
 
 # ================= START =================
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -98,10 +98,10 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         return
 
     text = (
-        f"✨ Welcome, {update.effective_user.first_name}! ✨\n\n"
-        "This is your personal space to shape your identity your way.\n\n"
-        "Share only what feels right — everything stays in your control.\n\n"
-        "Let’s get started 👇"
+        f"✨ 𝐖𝐞𝐥𝐜𝐨𝐦𝐞, {update.effective_user.first_name}! ✨\n\n"
+        "𝐓𝐡𝐢𝐬 𝐢𝐬 𝐲𝐨𝐮𝐫 𝐩𝐞𝐫𝐬𝐨𝐧𝐚𝐥 𝐬𝐩𝐚𝐜𝐞 𝐭𝐨 𝐬𝐡𝐚𝐩𝐞 𝐲𝐨𝐮𝐫 𝐢𝐝𝐞𝐧𝐭𝐢𝐭𝐲 𝐲𝐨𝐮𝐫 𝐰𝐚𝐲.\n\n"
+        "𝐒𝐡𝐚𝐫𝐞 𝐨𝐧𝐥𝐲 𝐰𝐡𝐚𝐭 𝐟𝐞𝐞𝐥𝐬 𝐫𝐢𝐠𝐡𝐭 — 𝐞𝐯𝐞𝐫𝐲𝐭𝐡𝐢𝐧𝐠 𝐬𝐭𝐚𝐲𝐬 𝐢𝐧 𝐲𝐨𝐮𝐫 𝐜𝐨𝐧𝐭𝐫𝐨𝐥.\n\n"
+        "𝐋𝐞𝐭’𝐬 𝐠𝐞𝐭 𝐬𝐭𝐚𝐫𝐭𝐞𝐝 👇"
     )
 
     await update.message.reply_text(text, reply_markup=welcome_inline())
@@ -114,20 +114,21 @@ async def help_cb(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     if q.data == "help":
         await q.edit_message_text(
-            "🤖 INTRO BOT – HELP\n\n"
-            "• Identity setup works in DM only\n"
-            "• Use /intro in groups\n"
-            "• Profile photo is taken from user's Telegram DP\n"
-            "• Profile commands are ADMIN ONLY\n"
-            "• Skipped fields show as N/A",
+            "🤖 𝗜𝗡𝗧𝗥𝗢 𝗕𝗢𝗧 — 𝗛𝗘𝗟𝗣\n\n"
+            "• 𝗜𝗱𝗲𝗻𝘁𝗶𝘁𝘆 𝘀𝗲𝘁𝘂𝗽 𝗼𝗻𝗹𝘆 𝘄𝗼𝗿𝗸𝘀 𝗶𝗻 𝗽𝗿𝗶𝘃𝗮𝘁𝗲 𝗰𝗵𝗮𝘁 (𝗗𝗠)\n"
+            "• 𝗨𝘀𝗲 /intro 𝗶𝗻 𝗴𝗿𝗼𝘂𝗽𝘀 𝘁𝗼 𝘃𝗶𝗲𝘄 𝗮𝗻𝘆 𝘂𝘀𝗲𝗿’𝘀 𝗽𝗿𝗼𝗳𝗶𝗹𝗲\n"
+            "• 𝗣𝗿𝗼𝗳𝗶𝗹𝗲 𝗽𝗵𝗼𝘁𝗼 𝗶𝘀 𝗮𝘂𝘁𝗼-𝗳𝗲𝘁𝗰𝗵𝗲𝗱 𝗳𝗿𝗼𝗺 𝘂𝘀𝗲𝗿’𝘀 𝗧𝗲𝗹𝗲𝗴𝗿𝗮𝗺 𝗗𝗣\n"
+            "• 𝗣𝗿𝗼𝗳𝗶𝗹𝗲 𝗺𝗮𝗻𝗮𝗴𝗲𝗺𝗲𝗻𝘁 𝗰𝗼𝗺𝗺𝗮𝗻𝗱𝘀 𝗮𝗿𝗲 𝗿𝗲𝘀𝘁𝗿𝗶𝗰𝘁𝗲𝗱 𝘁𝗼 𝗴𝗿𝗼𝘂𝗽 𝗮𝗱𝗺𝗶𝗻𝘀\n"
+            "• 𝗦𝗸𝗶𝗽𝗽𝗲𝗱 𝗳𝗶𝗲𝗹𝗱𝘀 𝘄𝗶𝗹𝗹 𝗮𝗽𝗽𝗲𝗮𝗿 𝗮𝘀 𝗡/𝗔\n"
+            "• 𝗬𝗼𝘂 𝗿𝗲𝗺𝗮𝗶𝗻 𝗶𝗻 𝗳𝘂𝗹𝗹 𝗰𝗼𝗻𝘁𝗿𝗼𝗹 𝗼𝗳 𝘆𝗼𝘂𝗿 𝗶𝗱𝗲𝗻𝘁𝗶𝘁𝘆",
             reply_markup=help_inline()
         )
     elif q.data == "back":
         await q.edit_message_text(
-            f"✨ Welcome, {q.from_user.first_name}! ✨\n\n"
-            "This is your personal space to shape your identity your way.\n\n"
-            "Share only what feels right — everything stays in your control.\n\n"
-            "Let’s get started 👇",
+            f"✨ 𝐖𝐞𝐥𝐜𝐨𝐦𝐞, {q.from_user.first_name}! ✨\n\n"
+            "𝐓𝐡𝐢𝐬 𝐢𝐬 𝐲𝐨𝐮𝐫 𝐩𝐞𝐫𝐬𝐨𝐧𝐚𝐥 𝐬𝐩𝐚𝐜𝐞 𝐭𝐨 𝐬𝐡𝐚𝐩𝐞 𝐲𝐨𝐮𝐫 𝐢𝐝𝐞𝐧𝐭𝐢𝐭𝐲 𝐲𝐨𝐮𝐫 𝐰𝐚𝐲.\n\n"
+            "𝐒𝐡𝐚𝐫𝐞 𝐨𝐧𝐥𝐲 𝐰𝐡𝐚𝐭 𝐟𝐞𝐞𝐥𝐬 𝐫𝐢𝐠𝐡𝐭 — 𝐞𝐯𝐞𝐫𝐲𝐭𝐡𝐢𝐧𝐠 𝐬𝐭𝐚𝐲𝐬 𝐢𝐧 𝐲𝐨𝐮𝐫 𝐜𝐨𝐧𝐭𝐫𝐨𝐥.\n\n"
+            "𝐋𝐞𝐭’𝐬 𝐠𝐞𝐭 𝐬𝐭𝐚𝐫𝐭𝐞𝐝 👇",
             reply_markup=welcome_inline()
         )
 
@@ -142,19 +143,19 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user = get_user(data, uid)
 
     # ✅ FIRST: allow Set / Edit Identity (reset submitted)
-    if msg in ["✨ Set Identity", "✏️ Edit Identity"]:
+    if msg in ["✨ 𝗦𝗲𝘁 𝗜𝗱𝗲𝗻𝘁𝗶𝘁𝘆", "✏️ 𝗘𝗱𝗶𝘁 𝗜𝗱𝗲𝗻𝘁𝗶𝘁𝘆"]:
         ctx.user_data.clear()
         user["submitted"] = False          # 🔥 FIX
         user["identity"] = {k: "N/A" for k in user["identity"]}
         ctx.user_data["step"] = "name"
         save(data)
         await update.message.reply_text(
-            "👤 Enter Name:",
+            "👤 𝗘𝗻𝘁𝗲𝗿 𝘆𝗼𝘂𝗿 𝗻𝗮𝗺𝗲 𝘁𝗼 𝗯𝗲𝗴𝗶𝗻:",
             reply_markup=ReplyKeyboardRemove()
         )
         return
 
-    # 🔒 AUTO DELETE AFTER SUBMIT (ONLY WHEN NOT EDITING)
+# 🔒 AUTO DELETE AFTER SUBMIT (ONLY WHEN NOT EDITING)
     if user.get("submitted"):
         try:
             await update.message.delete()
@@ -162,9 +163,12 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             pass
         return
 
-    if msg == "Cancel":
+    if msg == "𝗖𝗮𝗻𝗰𝗲𝗹":
         ctx.user_data.clear()
-        await update.message.reply_text("Cancelled.", reply_markup=KB_SET)
+        await update.message.reply_text(
+            "𝗜𝗱𝗲𝗻𝘁𝗶𝘁𝘆 𝘀𝗲𝘁𝘂𝗽 𝗰𝗮𝗻𝗰𝗲𝗹𝗹𝗲𝗱.",
+            reply_markup=KB_SET
+        )
         return
 
     step = ctx.user_data.get("step")
@@ -177,49 +181,55 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if step == "name":
         user["identity"]["name"] = val(msg)
         ctx.user_data["step"] = "age"
-        await update.message.reply_text("🎂 Enter Age (10–50):")
+        await update.message.reply_text(
+            "🎂 𝗘𝗻𝘁𝗲𝗿 𝘆𝗼𝘂𝗿 𝗮𝗴𝗲 (𝟭𝟬–𝟱𝟬):"
+        )
 
     elif step == "age":
         if not msg.isdigit() or not (10 <= int(msg) <= 50):
-            await update.message.reply_text("❌ Age must be 10–50.")
+            await update.message.reply_text(
+                "❌ 𝗔𝗴𝗲 𝗺𝘂𝘀𝘁 𝗯𝗲 𝗯𝗲𝘁𝘄𝗲𝗲𝗻 𝟭𝟬 𝗮𝗻𝗱 𝟱𝟬."
+            )
             return
         user["identity"]["age"] = msg
         ctx.user_data["step"] = "location"
-        await update.message.reply_text("📍 Enter Location:")
+        await update.message.reply_text(
+            "📍 𝗘𝗻𝘁𝗲𝗿 𝘆𝗼𝘂𝗿 𝗹𝗼𝗰𝗮𝘁𝗶𝗼𝗻:"
+        )
 
     elif step == "location":
         user["identity"]["location"] = val(msg)
         ctx.user_data["step"] = "gender"
         await update.message.reply_text(
-            "🧬 Select Gender:",
+            "🧬 𝗦𝗲𝗹𝗲𝗰𝘁 𝘆𝗼𝘂𝗿 𝗴𝗲𝗻𝗱𝗲𝗿:",
             reply_markup=KB_GENDER
         )
 
     elif step == "gender":
-        if msg not in ["Male 💁‍♂️", "Female 💁‍♀️"]:
+        if msg not in ["𝗠𝗮𝗹𝗲 💁‍♂️", "𝗙𝗲𝗺𝗮𝗹𝗲 💁‍♀️"]:
             await update.message.reply_text(
-                "❌ Please select gender using buttons only.",
+                "❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗹𝗲𝗰𝘁 𝗴𝗲𝗻𝗱𝗲𝗿 𝘂𝘀𝗶𝗻𝗴 𝘁𝗵𝗲 𝗯𝘂𝘁𝘁𝗼𝗻𝘀 𝗼𝗻𝗹𝘆.",
                 reply_markup=KB_GENDER
             )
             return
-        user["identity"]["gender"] = f"🧬 Gender - {msg}"
+        user["identity"]["gender"] = f"🧬 𝗚𝗲𝗻𝗱𝗲𝗿 — {msg}"
         ctx.user_data["step"] = "relationship"
         await update.message.reply_text(
-            "💓 Relationship:",
+            "💓 𝗦𝗲𝗹𝗲𝗰𝘁 𝘆𝗼𝘂𝗿 𝗿𝗲𝗹𝗮𝘁𝗶𝗼𝗻𝘀𝗵𝗶𝗽 𝘀𝘁𝗮𝘁𝘂𝘀:",
             reply_markup=KB_REL
         )
 
     elif step == "relationship":
-        if msg not in ["Single 🖤", "Mingle ♥️"]:
+        if msg not in ["𝗦𝗶𝗻𝗴𝗹𝗲 🖤", "𝗠𝗶𝗻𝗴𝗹𝗲 ♥️"]:
             await update.message.reply_text(
-                "❌ Please select relationship using buttons only.",
+                "❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝗹𝗲𝗰𝘁 𝗿𝗲𝗹𝗮𝘁𝗶𝗼𝗻𝘀𝗵𝗶𝗽 𝘂𝘀𝗶𝗻𝗴 𝘁𝗵𝗲 𝗯𝘂𝘁𝘁𝗼𝗻𝘀 𝗼𝗻𝗹𝘆.",
                 reply_markup=KB_REL
             )
             return
-        user["identity"]["relationship"] = f"💓 Relationship - {msg}"
+        user["identity"]["relationship"] = f"💓 𝗥𝗲𝗹𝗮𝘁𝗶𝗼𝗻𝘀𝗵𝗶𝗽 — {msg}"
         ctx.user_data["step"] = "song"
         await update.message.reply_text(
-            "🎵 Favorite Song:",
+            "🎵 𝗘𝗻𝘁𝗲𝗿 𝘆𝗼𝘂𝗿 𝗳𝗮𝘃𝗼𝗿𝗶𝘁𝗲 𝘀𝗼𝗻𝗴:",
             reply_markup=KB_SKIP_CANCEL
         )
 
@@ -227,7 +237,7 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         user["identity"]["song"] = val(msg)
         ctx.user_data["step"] = "actor"
         await update.message.reply_text(
-            "🎬 Favorite Actor:",
+            "🎬 𝗘𝗻𝘁𝗲𝗿 𝘆𝗼𝘂𝗿 𝗳𝗮𝘃𝗼𝗿𝗶𝘁𝗲 𝗮𝗰𝘁𝗼𝗿:",
             reply_markup=KB_SKIP_CANCEL
         )
 
@@ -235,7 +245,7 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         user["identity"]["actor"] = val(msg)
         ctx.user_data["step"] = "hobby"
         await update.message.reply_text(
-            "🎯 Favorite Hobby:",
+            "🎯 𝗘𝗻𝘁𝗲𝗿 𝘆𝗼𝘂𝗿 𝗳𝗮𝘃𝗼𝗿𝗶𝘁𝗲 𝗵𝗼𝗯𝗯𝘆:",
             reply_markup=KB_SKIP_CANCEL
         )
 
@@ -243,7 +253,7 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         user["identity"]["hobby"] = val(msg)
         ctx.user_data["step"] = "bio"
         await update.message.reply_text(
-            "📝 Short Bio:",
+            "📝 𝗪𝗿𝗶𝘁𝗲 𝗮 𝘀𝗵𝗼𝗿𝘁 𝗯𝗶𝗼 𝗮𝗯𝗼𝘂𝘁 𝘆𝗼𝘂:",
             reply_markup=KB_SKIP_CANCEL
         )
 
@@ -252,8 +262,8 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         user["submitted"] = True
         ctx.user_data.clear()
         await update.message.reply_text(
-            "✅ Identity submitted successfully.\n\n"
-            "Please contact your group administration to set your profile photo.",
+            "✅ 𝗜𝗱𝗲𝗻𝘁𝗶𝘁𝘆 𝘀𝘂𝗯𝗺𝗶𝘁𝘁𝗲𝗱 𝘀𝘂𝗰𝗰𝗲𝘀𝘀𝗳𝘂𝗹𝗹𝘆.\n\n"
+            "𝗣𝗹𝗲𝗮𝘀𝗲 𝗰𝗼𝗻𝘁𝗮𝗰𝘁 𝘆𝗼𝘂𝗿 𝗴𝗿𝗼𝘂𝗽 𝗮𝗱𝗺𝗶𝗻𝗶𝘀𝘁𝗿𝗮𝘁𝗶𝗼𝗻 𝘁𝗼 𝘀𝗲𝘁 𝘆𝗼𝘂𝗿 𝗽𝗿𝗼𝗳𝗶𝗹𝗲 𝗽𝗵𝗼𝘁𝗼.",
             reply_markup=KB_EDIT
         )
 
@@ -264,10 +274,14 @@ async def setprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
     if not await is_group_admin(update, ctx):
-        await update.message.reply_text("❌ This command is for group administrators only.")
+        await update.message.reply_text(
+            "❌ 𝗧𝗵𝗶𝘀 𝗰𝗼𝗺𝗺𝗮𝗻𝗱 𝗶𝘀 𝗿𝗲𝘀𝘁𝗿𝗶𝗰𝘁𝗲𝗱 𝘁𝗼 𝗴𝗿𝗼𝘂𝗽 𝗮𝗱𝗺𝗶𝗻𝗶𝘀𝘁𝗿𝗮𝘁𝗼𝗿𝘀 𝗼𝗻𝗹𝘆."
+        )
         return
     if not update.message.reply_to_message:
-        await update.message.reply_text("❌ Reply to a user to set their profile.")
+        await update.message.reply_text(
+            "❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝗿𝗲𝗽𝗹𝘆 𝘁𝗼 𝗮 𝘂𝘀𝗲𝗿 𝘁𝗼 𝘀𝗲𝘁 𝘁𝗵𝗲𝗶𝗿 𝗽𝗿𝗼𝗳𝗶𝗹𝗲."
+        )
         return
 
     data = load()
@@ -278,21 +292,29 @@ async def setprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     photos = await ctx.bot.get_user_profile_photos(target.id, limit=1)
     if photos.total_count == 0:
-        await update.message.reply_text("❌ User has no Telegram profile photo.")
+        await update.message.reply_text(
+            "❌ 𝗧𝗵𝗶𝘀 𝘂𝘀𝗲𝗿 𝗱𝗼𝗲𝘀 𝗻𝗼𝘁 𝗵𝗮𝘃𝗲 𝗮𝗻𝘆 𝗧𝗲𝗹𝗲𝗴𝗿𝗮𝗺 𝗽𝗿𝗼𝗳𝗶𝗹𝗲 𝗽𝗵𝗼𝘁𝗼."
+        )
         return
 
     user["groups"][gid] = photos.photos[0][-1].file_id
     save(data)
-    await update.message.reply_text("✅ Profile photo set from user's Telegram DP.")
+    await update.message.reply_text(
+        "✅ 𝗣𝗿𝗼𝗳𝗶𝗹𝗲 𝗽𝗵𝗼𝘁𝗼 𝘀𝗲𝘁 𝘀𝘂𝗰𝗰𝗲𝘀𝘀𝗳𝘂𝗹𝗹𝘆 𝗳𝗿𝗼𝗺 𝘂𝘀𝗲𝗿’𝘀 𝗧𝗲𝗹𝗲𝗴𝗿𝗮𝗺 𝗗𝗣."
+    )
 
 async def updateprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
     if not await is_group_admin(update, ctx):
-        await update.message.reply_text("❌ This command is for group administrators only.")
+        await update.message.reply_text(
+            "❌ 𝗧𝗵𝗶𝘀 𝗰𝗼𝗺𝗺𝗮𝗻𝗱 𝗶𝘀 𝗿𝗲𝘀𝘁𝗿𝗶𝗰𝘁𝗲𝗱 𝘁𝗼 𝗴𝗿𝗼𝘂𝗽 𝗮𝗱𝗺𝗶𝗻𝗶𝘀𝘁𝗿𝗮𝘁𝗼𝗿𝘀 𝗼𝗻𝗹𝘆."
+        )
         return
     if not update.message.reply_to_message:
-        await update.message.reply_text("❌ Reply to a user to update their profile.")
+        await update.message.reply_text(
+            "❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝗿𝗲𝗽𝗹𝘆 𝘁𝗼 𝗮 𝘂𝘀𝗲𝗿 𝘁𝗼 𝘂𝗽𝗱𝗮𝘁𝗲 𝘁𝗵𝗲𝗶𝗿 𝗽𝗿𝗼𝗳𝗶𝗹𝗲."
+        )
         return
 
     data = load()
@@ -303,21 +325,29 @@ async def updateprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     photos = await ctx.bot.get_user_profile_photos(target.id, limit=1)
     if photos.total_count == 0:
-        await update.message.reply_text("❌ User has no Telegram profile photo.")
+        await update.message.reply_text(
+            "❌ 𝗧𝗵𝗶𝘀 𝘂𝘀𝗲𝗿 𝗱𝗼𝗲𝘀 𝗻𝗼𝘁 𝗵𝗮𝘃𝗲 𝗮𝗻𝘆 𝗧𝗲𝗹𝗲𝗴𝗿𝗮𝗺 𝗽𝗿𝗼𝗳𝗶𝗹𝗲 𝗽𝗵𝗼𝘁𝗼."
+        )
         return
 
     user["groups"][gid] = photos.photos[0][-1].file_id
     save(data)
-    await update.message.reply_text("♻️ Profile photo updated from user's Telegram DP.")
+    await update.message.reply_text(
+        "♻️ 𝗣𝗿𝗼𝗳𝗶𝗹𝗲 𝗽𝗵𝗼𝘁𝗼 𝘂𝗽𝗱𝗮𝘁𝗲𝗱 𝘀𝘂𝗰𝗰𝗲𝘀𝘀𝗳𝘂𝗹𝗹𝘆."
+    )
 
 async def removeprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat.type == "private":
         return
     if not await is_group_admin(update, ctx):
-        await update.message.reply_text("❌ This command is for group administrators only.")
+        await update.message.reply_text(
+            "❌ 𝗧𝗵𝗶𝘀 𝗰𝗼𝗺𝗺𝗮𝗻𝗱 𝗶𝘀 𝗿𝗲𝘀𝘁𝗿𝗶𝗰𝘁𝗲𝗱 𝘁𝗼 𝗴𝗿𝗼𝘂𝗽 𝗮𝗱𝗺𝗶𝗻𝗶𝘀𝘁𝗿𝗮𝘁𝗼𝗿𝘀 𝗼𝗻𝗹𝘆."
+        )
         return
     if not update.message.reply_to_message:
-        await update.message.reply_text("❌ Reply to a user to remove their profile.")
+        await update.message.reply_text(
+            "❌ 𝗣𝗹𝗲𝗮𝘀𝗲 𝗿𝗲𝗽𝗹𝘆 𝘁𝗼 𝗮 𝘂𝘀𝗲𝗿 𝘁𝗼 𝗿𝗲𝗺𝗼𝘃𝗲 𝘁𝗵𝗲𝗶𝗿 𝗽𝗿𝗼𝗳𝗶𝗹𝗲."
+        )
         return
 
     data = load()
@@ -329,7 +359,9 @@ async def removeprofile(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if gid in user["groups"]:
         del user["groups"][gid]
         save(data)
-        await update.message.reply_text("🗑 Profile photo removed.")
+        await update.message.reply_text(
+            "🗑 𝗣𝗿𝗼𝗳𝗶𝗹𝗲 𝗽𝗵𝗼𝘁𝗼 𝗿𝗲𝗺𝗼𝘃𝗲𝗱 𝘀𝘂𝗰𝗰𝗲𝘀𝘀𝗳𝘂𝗹𝗹𝘆."
+        )
 
 # ================= INTRO (GROUP) =================
 async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -338,7 +370,6 @@ async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     data = load()
 
-    # target decide
     if update.message.reply_to_message:
         target = update.message.reply_to_message.from_user
     else:
@@ -352,23 +383,25 @@ async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     if not user or not user.get("submitted"):
         await update.message.reply_text(
-            f"{mention} has not set identity yet.\nPlease set your identity in DM.",
+            f"{mention} 𝗵𝗮𝘀 𝗻𝗼𝘁 𝘀𝗲𝘁 𝘁𝗵𝗲𝗶𝗿 𝗶𝗱𝗲𝗻𝘁𝗶𝘁𝘆 𝘆𝗲𝘁.\n"
+            "𝗣𝗹𝗲𝗮𝘀𝗲 𝗰𝗼𝗺𝗽𝗹𝗲𝘁𝗲 𝘆𝗼𝘂𝗿 𝗶𝗱𝗲𝗻𝘁𝗶𝘁𝘆 𝗶𝗻 𝗗𝗠.",
             parse_mode="HTML"
         )
         return
 
     p = user["identity"]
     caption = (
-        f"👤 Profile\n\n"
-        f"👤 Name: {p['name']}\n"
-        f"🎂 Age: {p['age']}\n"
-        f"📍 Location: {p['location']}\n"
+        "👤 𝗣𝗥𝗢𝗙𝗜𝗟𝗘\n\n"
+        f"👤 𝗡𝗮𝗺𝗲: {p['name']}\n"
+        f"🎂 𝗔𝗴𝗲: {p['age']}\n"
+        f"📍 𝗟𝗼𝗰𝗮𝘁𝗶𝗼𝗻: {p['location']}\n"
         f"{p['gender']}\n"
         f"{p['relationship']}\n"
-        f"🎵 Song: {p['song']}\n"
-        f"🎬 Actor: {p['actor']}\n"
-        f"🎯 Hobby: {p['hobby']}\n\n"
-        f"📝 Bio:\n{p['bio']}"
+        f"🎵 𝗦𝗼𝗻𝗴: {p['song']}\n"
+        f"🎬 𝗔𝗰𝘁𝗼𝗿: {p['actor']}\n"
+        f"🎯 𝗛𝗼𝗯𝗯𝘆: {p['hobby']}\n\n"
+        "📝 𝗕𝗜𝗢:\n"
+        f"{p['bio']}"
     )
 
     if gid in user.get("groups", {}):
@@ -380,14 +413,16 @@ async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 async def welcome_member(update: ChatMemberUpdated, ctx: ContextTypes.DEFAULT_TYPE):
     if update.chat.type == "private":
         return
+
     if update.new_chat_member.status == "member":
         u = update.new_chat_member.user
         mention = f'<a href="tg://user?id={u.id}">{u.first_name}</a>'
+
         await ctx.bot.send_message(
             update.chat.id,
-            f"👋 Welcome {mention}!\n\n"
-            "🆔 Please set your identity by messaging me in DM.\n"
-            "🖼 Profile photo will be set by group administration.",
+            f"👋 𝗪𝗲𝗹𝗰𝗼𝗺𝗲 {mention}!\n\n"
+            "🆔 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝘁 𝘆𝗼𝘂𝗿 𝗶𝗱𝗲𝗻𝘁𝗶𝘁𝘆 𝗯𝘆 𝗺𝗲𝘀𝘀𝗮𝗴𝗶𝗻𝗴 𝗺𝗲 𝗶𝗻 𝗗𝗠.\n"
+            "🖼 𝗣𝗿𝗼𝗳𝗶𝗹𝗲 𝗽𝗵𝗼𝘁𝗼 𝘄𝗶𝗹𝗹 𝗯𝗲 𝘀𝗲𝘁 𝗯𝘆 𝗴𝗿𝗼𝘂𝗽 𝗮𝗱𝗺𝗶𝗻𝗶𝘀𝘁𝗿𝗮𝘁𝗶𝗼𝗻.",
             parse_mode="HTML"
         )
 
@@ -403,5 +438,5 @@ app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_dm))
 app.add_handler(CallbackQueryHandler(help_cb, pattern="^(help|back)$"))
 app.add_handler(ChatMemberHandler(welcome_member, ChatMemberHandler.CHAT_MEMBER))
 
-print("✅ INTRO BOT RUNNING (FINAL – ADMIN SAFE)")
+print("✅ 𝗜𝗡𝗧𝗥𝗢 𝗕𝗢𝗧 𝗥𝗨𝗡𝗡𝗜𝗡𝗚 — 𝗗𝗘𝗩𝗘𝗟𝗢𝗣𝗘𝗗 𝗕𝗬 𝗙𝗿𝘅_𝗦𝗵𝗼𝗼𝘁𝗲𝗿")
 app.run_polling()
