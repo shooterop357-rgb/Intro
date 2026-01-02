@@ -141,21 +141,25 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     uid = str(update.effective_user.id)
     user = get_user(data, uid)
 
-    # 🔒 AUTO DELETE AFTER SUBMIT
-    if user.get("submitted"):
-        if msg not in ["✨ Set Identity", "✏️ Edit Identity"]:
-            try:
-                await update.message.delete()
-            except:
-                pass
-            return
-
+    # ✅ FIRST: allow Set / Edit Identity (reset submitted)
     if msg in ["✨ Set Identity", "✏️ Edit Identity"]:
         ctx.user_data.clear()
+        user["submitted"] = False          # 🔥 FIX
         user["identity"] = {k: "N/A" for k in user["identity"]}
         ctx.user_data["step"] = "name"
         save(data)
-        await update.message.reply_text("👤 Enter Name:", reply_markup=ReplyKeyboardRemove())
+        await update.message.reply_text(
+            "👤 Enter Name:",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        return
+
+    # 🔒 AUTO DELETE AFTER SUBMIT (ONLY WHEN NOT EDITING)
+    if user.get("submitted"):
+        try:
+            await update.message.delete()
+        except:
+            pass
         return
 
     if msg == "Cancel":
@@ -167,7 +171,7 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if not step:
         return
 
-    def val(x): 
+    def val(x):
         return "N/A" if x.lower() == "skip" else x
 
     if step == "name":
@@ -186,7 +190,10 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     elif step == "location":
         user["identity"]["location"] = val(msg)
         ctx.user_data["step"] = "gender"
-        await update.message.reply_text("🧬 Select Gender:", reply_markup=KB_GENDER)
+        await update.message.reply_text(
+            "🧬 Select Gender:",
+            reply_markup=KB_GENDER
+        )
 
     elif step == "gender":
         if msg not in ["Male 💁‍♂️", "Female 💁‍♀️"]:
@@ -197,7 +204,10 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             return
         user["identity"]["gender"] = f"🧬 Gender - {msg}"
         ctx.user_data["step"] = "relationship"
-        await update.message.reply_text("💓 Relationship:", reply_markup=KB_REL)
+        await update.message.reply_text(
+            "💓 Relationship:",
+            reply_markup=KB_REL
+        )
 
     elif step == "relationship":
         if msg not in ["Single 🖤", "Mingle ♥️"]:
@@ -208,22 +218,34 @@ async def text_dm(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             return
         user["identity"]["relationship"] = f"💓 Relationship - {msg}"
         ctx.user_data["step"] = "song"
-        await update.message.reply_text("🎵 Favorite Song:", reply_markup=KB_SKIP_CANCEL)
+        await update.message.reply_text(
+            "🎵 Favorite Song:",
+            reply_markup=KB_SKIP_CANCEL
+        )
 
     elif step == "song":
         user["identity"]["song"] = val(msg)
         ctx.user_data["step"] = "actor"
-        await update.message.reply_text("🎬 Favorite Actor:", reply_markup=KB_SKIP_CANCEL)
+        await update.message.reply_text(
+            "🎬 Favorite Actor:",
+            reply_markup=KB_SKIP_CANCEL
+        )
 
     elif step == "actor":
         user["identity"]["actor"] = val(msg)
         ctx.user_data["step"] = "hobby"
-        await update.message.reply_text("🎯 Favorite Hobby:", reply_markup=KB_SKIP_CANCEL)
+        await update.message.reply_text(
+            "🎯 Favorite Hobby:",
+            reply_markup=KB_SKIP_CANCEL
+        )
 
     elif step == "hobby":
         user["identity"]["hobby"] = val(msg)
         ctx.user_data["step"] = "bio"
-        await update.message.reply_text("📝 Short Bio:", reply_markup=KB_SKIP_CANCEL)
+        await update.message.reply_text(
+            "📝 Short Bio:",
+            reply_markup=KB_SKIP_CANCEL
+        )
 
     elif step == "bio":
         user["identity"]["bio"] = val(msg)
