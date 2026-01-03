@@ -437,21 +437,20 @@ async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(caption)
 
 
-# ================= NEW MEMBER (FINAL & WORKING) =================
+# ================= NEW MEMBER (FINAL & CORRECT) =================
 async def welcome_member(update: ChatMemberUpdated, ctx: ContextTypes.DEFAULT_TYPE):
-    chat = update.my_chat_member.chat
+    chat = update.chat_member.chat
 
     if chat.type not in ("group", "supergroup"):
         return
 
-    old_status = update.my_chat_member.old_chat_member.status
-    new_status = update.my_chat_member.new_chat_member.status
+    old_status = update.chat_member.old_chat_member.status
+    new_status = update.chat_member.new_chat_member.status
 
     # ✅ REAL USER JOIN DETECTION
     if old_status in ("left", "kicked") and new_status == "member":
-        user = update.my_chat_member.new_chat_member.user
+        user = update.chat_member.new_chat_member.user
 
-        # ❌ Ignore bot itself
         if user.is_bot:
             return
 
@@ -481,8 +480,8 @@ app.add_handler(CommandHandler("removeprofile", removeprofile))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_dm))
 app.add_handler(CallbackQueryHandler(help_cb, pattern="^(help|back)$"))
 
-# ✅ NEW MEMBER JOIN DETECTION (CORRECT HANDLER)
-app.add_handler(ChatMemberHandler(welcome_member, ChatMemberHandler.MY_CHAT_MEMBER))
+# ✅ USER JOIN DETECTION (ONLY THIS IS CORRECT)
+app.add_handler(ChatMemberHandler(welcome_member, ChatMemberHandler.CHAT_MEMBER))
 
 print("INTRO BOT RUNNING | Developed by Frx_Shooter")
 app.run_polling()
