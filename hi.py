@@ -437,7 +437,7 @@ async def intro(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(caption)
 
 
-# ================= NEW MEMBER (FIXED) =================
+# ================= NEW MEMBER (UPDATED & FIXED) =================
 async def welcome_member(update: ChatMemberUpdated, ctx: ContextTypes.DEFAULT_TYPE):
     chat = update.chat_member.chat
 
@@ -447,17 +447,25 @@ async def welcome_member(update: ChatMemberUpdated, ctx: ContextTypes.DEFAULT_TY
     old_status = update.chat_member.old_chat_member.status
     new_status = update.chat_member.new_chat_member.status
 
-    # ✅ REAL JOIN DETECTION
-    if old_status in ("left", "kicked") and new_status == "member":
+    # ✅ REAL USER JOIN DETECTION (LEFT / KICKED / RESTRICTED → MEMBER)
+    if old_status in ("left", "kicked", "restricted") and new_status == "member":
         user = update.chat_member.new_chat_member.user
+
+        # ❌ Ignore bot itself
+        if user.is_bot:
+            return
+
         mention = f'<a href="tg://user?id={user.id}">{user.first_name}</a>'
 
         await ctx.bot.send_message(
-            chat.id,
-            f"👋 𝗪𝗲𝗹𝗰𝗼𝗺𝗲 {mention}!\n\n"
-            "🆔 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝘁 𝘆𝗼𝘂𝗿 𝗶𝗱𝗲𝗻𝘁𝗶𝘁𝘆 𝗯𝘆 𝗺𝗲𝘀𝘀𝗮𝗴𝗶𝗻𝗴 𝗺𝗲 𝗶𝗻 𝗗𝗠.\n"
-            "🖼 𝗣𝗿𝗼𝗳𝗶𝗹𝗲 𝗽𝗵𝗼𝘁𝗼 𝘄𝗶𝗹𝗹 𝗯𝗲 𝘀𝗲𝘁 𝗯𝘆 𝗴𝗿𝗼𝘂𝗽 𝗮𝗱𝗺𝗶𝗻𝗶𝘀𝘁𝗿𝗮𝘁𝗶𝗼𝗻.",
-            parse_mode="HTML"
+            chat_id=chat.id,
+            text=(
+                f"👋 𝗪𝗲𝗹𝗰𝗼𝗺𝗲 {mention}!\n\n"
+                "🆔 𝗣𝗹𝗲𝗮𝘀𝗲 𝘀𝗲𝘁 𝘆𝗼𝘂𝗿 𝗶𝗱𝗲𝗻𝘁𝗶𝘁𝘆 𝗯𝘆 𝗺𝗲𝘀𝘀𝗮𝗴𝗶𝗻𝗴 𝗺𝗲 𝗶𝗻 𝗗𝗠.\n"
+                "🖼 𝗣𝗿𝗼𝗳𝗶𝗹𝗲 𝗽𝗵𝗼𝘁𝗼 𝘄𝗶𝗹𝗹 𝗯𝗲 𝘀𝗲𝘁 𝗯𝘆 𝗴𝗿𝗼𝘂𝗽 𝗮𝗱𝗺𝗶𝗻𝗶𝘀𝘁𝗿𝗮𝘁𝗶𝗼𝗻."
+            ),
+            parse_mode="HTML",
+            disable_web_page_preview=True
         )
 
 
